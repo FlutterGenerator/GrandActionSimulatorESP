@@ -90,8 +90,8 @@ public class FloatingModMenuService extends Service {
     int MENU_BG_COLOR = Color.parseColor("#DD000000"); // #AARRGGBB
     int MENU_FEATURE_BG_COLOR = Color.parseColor("#A0000000"); // #AARRGGBB
 
-    int MENU_WIDTH = 240; // 290
-    int MENU_HEIGHT = 160; // 210
+    int MENU_WIDTH = 290; // 290
+    int MENU_HEIGHT = 210; // 210
     float MENU_CORNER = 4.0f;
 
     int ICON_SIZE = 45; // Change both width and height of image
