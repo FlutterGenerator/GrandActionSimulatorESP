@@ -190,7 +190,7 @@ extern "C" {
             "100_Toggle_ Enable Esp ",
             "200_Toggle_ Esp Line ",
             "300_Toggle_ Esp Box ",
-            "400_CheckBox__Top,Center,Down",
+            "400_RadioButton__Top,Center,Down",
             
 			
         };
