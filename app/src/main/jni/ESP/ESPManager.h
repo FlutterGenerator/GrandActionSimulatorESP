@@ -6,6 +6,7 @@ struct enemy_t {
     int health;
 
 };
+
 class ESPManager {
 public:
     std::vector<enemy_t *> *enemies;
@@ -13,6 +14,7 @@ public:
     ESPManager() {
         enemies = new std::vector<enemy_t *>();
     }
+
     bool isEnemyPresent(void *enemyObject) {
         for (std::vector<enemy_t *>::iterator it = enemies->begin(); it != enemies->end(); it++) {
             if ((*it)->object == enemyObject) {
@@ -21,6 +23,7 @@ public:
         }
         return false;
     }
+
     void removeEnemy(enemy_t *enemy) {
         for (int i = 0; i < enemies->size(); i++) {
             if ((*enemies)[i] == enemy) {
@@ -29,6 +32,7 @@ public:
             }
         }
     }
+
     void tryAddEnemy(void *enemyObject) {
         if (isEnemyPresent(enemyObject)) {
             return;
@@ -44,6 +48,7 @@ public:
 
         enemies->push_back(newEnemy);
     }
+
     void updateEnemies(void *enemyObject) {
         for (int i = 0; i < enemies->size(); i++) {
             enemy_t *current = (*enemies)[i];
@@ -53,6 +58,7 @@ public:
             }
         }
     }
+
     void removeEnemyGivenObject(void *enemyObject) {
         for (int i = 0; i < enemies->size(); i++) {
             if ((*enemies)[i]->object == enemyObject) {

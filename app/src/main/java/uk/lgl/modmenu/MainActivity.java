@@ -1,26 +1,24 @@
-package uk.lgl;
+package uk.lgl.modmenu;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
-import android.widget.Toast;
 import android.util.Base64;
 import android.util.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.Objects;
 
-import uk.lgl.modmenu.FloatingModMenuService;
-import uk.lgl.modmenu.Sounds;
+import uk.lgl.R;
 
 public class MainActivity extends Activity {
 
-    private static final String TAG = "Mod Menu";
+    private static final String TAG = "Mod_Menu";
     public static String cacheDir;
 
     // Only if you have changed MainActivity to yours and you wanna call game's activity.
@@ -47,31 +45,20 @@ public class MainActivity extends Activity {
                 hasLaunched = true;
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
-                return;
             }
         }
     }
 
     public static void Start(final Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(context)) {
+        if (!Settings.canDrawOverlays(context)) {
             context.startActivity(new Intent("android.settings.action.MANAGE_OVERLAY_PERMISSION",
-            Uri.parse("package:" + context.getPackageName())));
+                    Uri.parse("package:" + context.getPackageName())));
             final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    System.exit(1);
-                }
-            }, 5000);
+            handler.postDelayed(() -> System.exit(1), 5000);
             return;
         } else {
             final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    context.startService(new Intent(context, FloatingModMenuService.class));
-                }
-            }, 500);
+            handler.postDelayed(() -> context.startService(new Intent(context, FloatingModMenuService.class)), 500);
         }
         cacheDir = context.getCacheDir().getPath() + "/";
 
@@ -87,15 +74,13 @@ public class MainActivity extends Activity {
     private static void writeToFile(String name, String base64) {
         File file = new File(cacheDir + name);
         try {
-            if (!file.exists()) {
-                file.createNewFile();
-            }
+            if (!file.exists()) file.createNewFile();
             FileOutputStream fos = new FileOutputStream(file);
             byte[] decode = Base64.decode(base64, 0);
             fos.write(decode);
             fos.close();
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(TAG, Objects.requireNonNull(e.getMessage()));
         }
     }
 }

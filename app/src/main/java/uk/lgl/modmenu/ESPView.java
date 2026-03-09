@@ -4,18 +4,13 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Paint.Align;
-import android.graphics.Paint.Style;
 import android.graphics.PorterDuff;
-import android.graphics.PorterDuff.Mode;
-import android.os.Process;
 import android.util.Log;
 import android.view.View;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-
-import uk.lgl.modmenu.FloatingModMenuService;
 
 public class ESPView extends View implements Runnable {
     Paint mStrokePaint;

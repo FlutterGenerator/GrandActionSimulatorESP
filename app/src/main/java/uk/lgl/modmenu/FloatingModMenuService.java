@@ -2,29 +2,37 @@
 
 package uk.lgl.modmenu;
 
-import android.animation.ValueAnimator;
+import static android.text.Html.fromHtml;
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+import static android.widget.RelativeLayout.ALIGN_PARENT_LEFT;
+import static android.widget.RelativeLayout.ALIGN_PARENT_RIGHT;
+import static uk.lgl.modmenu.MainActivity.cacheDir;
+
 import android.animation.ArgbEvaluator;
 import android.animation.TimeAnimator;
+import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.AlertDialog;
 import android.app.Service;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
-import android.text.Html;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -58,23 +66,13 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
-import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-import static android.widget.RelativeLayout.ALIGN_PARENT_LEFT;
-import static android.widget.RelativeLayout.ALIGN_PARENT_RIGHT;
-import android.graphics.Canvas;
-import android.content.Context;
-import android.graphics.PixelFormat;
-
-import static uk.lgl.MainActivity.cacheDir;
+import android.graphics.PorterDuffColorFilter;
 
 public class FloatingModMenuService extends Service {
     // ********** Here you can easly change the menu appearance **********//
@@ -203,12 +201,12 @@ public class FloatingModMenuService extends Service {
 
         WindowManager.LayoutParams layoutParams;
         this.espParams = layoutParams = new WindowManager.LayoutParams(
-        WindowManager.LayoutParams.MATCH_PARENT,
-        WindowManager.LayoutParams.MATCH_PARENT,
-        this.getLayoutType(),
-        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL |
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-        PixelFormat.TRANSLUCENT);
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
+                this.getLayoutType(),
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL |
+                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                PixelFormat.TRANSLUCENT);
         layoutParams.gravity = Gravity.TOP | Gravity.START;
         this.espParams.x = 0;
         this.espParams.y = 100;
@@ -222,7 +220,7 @@ public class FloatingModMenuService extends Service {
         rootFrame = new FrameLayout(this); // Global markup
         rootFrame.setOnTouchListener(onTouchListener());
         mRootContainer = new RelativeLayout(this); // Markup on which two markups of the icon and
-                                                   // the menu itself will be placed
+        // the menu itself will be placed
         mCollapsed = new RelativeLayout(this); // Markup of the icon (when the menu is minimized)
         mCollapsed.setVisibility(View.VISIBLE);
         mCollapsed.setAlpha(ICON_ALPHA);
@@ -243,7 +241,7 @@ public class FloatingModMenuService extends Service {
         // ********** The icon to open mod menu **********
         startimage = new ImageView(this);
         startimage.setLayoutParams(new RelativeLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
-        int applyDimension = (int) TypedValue.applyDimension(1, ICON_SIZE, getResources().getDisplayMetrics()); // Icon size
+        int applyDimension = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, ICON_SIZE, getResources().getDisplayMetrics()); // Icon size
         startimage.getLayoutParams().height = applyDimension;
         startimage.getLayoutParams().width = applyDimension;
         // startimage.requestLayout();
@@ -263,7 +261,7 @@ public class FloatingModMenuService extends Service {
         // ********** The icon in Webview to open mod menu **********
         WebView wView = new WebView(this); // Icon size width=\"50\" height=\"50\"
         wView.setLayoutParams(new RelativeLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
-        int applyDimension2 = (int) TypedValue.applyDimension(1, ICON_SIZE, getResources().getDisplayMetrics()); // Icon size
+        int applyDimension2 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, ICON_SIZE, getResources().getDisplayMetrics()); // Icon size
         wView.getLayoutParams().height = applyDimension2;
         wView.getLayoutParams().width = applyDimension2;
         wView.loadData("<html>" +
@@ -278,8 +276,8 @@ public class FloatingModMenuService extends Service {
 
         // ********** Settings icon **********
         TextView settings = new TextView(this); // Android 5 can't show ⚙, instead show other icon
-                                                // instead
-        settings.setText(Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M ? "⚙" : "\uD83D\uDD27");
+        // instead
+        settings.setText("⚙");
         settings.setTextColor(TEXT_COLOR);
         settings.setTypeface(Typeface.DEFAULT_BOLD);
         settings.setTextSize(20.0f);
@@ -555,7 +553,7 @@ public class FloatingModMenuService extends Service {
                     break;
                 case "SeekBar":
                     linearLayout.addView(SeekBar(featNum, strSplit[1], Integer.parseInt(strSplit[
-                    2]), Integer.parseInt(strSplit[3])));
+                            2]), Integer.parseInt(strSplit[3])));
                     break;
                 case "Button":
                     linearLayout.addView(Button(featNum, strSplit[1]));
@@ -573,7 +571,7 @@ public class FloatingModMenuService extends Service {
                 case "InputValue":
                     if (strSplit.length == 3)
                         linearLayout.addView(TextField(featNum, strSplit[
-                        2], true, Integer.parseInt(strSplit[1])));
+                                2], true, Integer.parseInt(strSplit[1])));
                     if (strSplit.length == 2)
                         linearLayout.addView(TextField(featNum, strSplit[1], true, 0));
                     break;
@@ -611,16 +609,16 @@ public class FloatingModMenuService extends Service {
     private View Switch(final int featNum, final String featName, boolean swiOn) {
         final Switch switchR = new Switch(this);
         ColorStateList buttonStates = new ColorStateList(
-        new int[][]{
-                new int[]{-android.R.attr.state_enabled},
-                new int[]{android.R.attr.state_checked},
-                new int[]{}
-        },
-        new int[]{
-                Color.BLUE,
-                ToggleON, // ON
-                ToggleOFF // OFF
-        }
+                new int[][]{
+                        new int[]{-android.R.attr.state_enabled},
+                        new int[]{android.R.attr.state_checked},
+                        new int[]{}
+                },
+                new int[]{
+                        Color.BLUE,
+                        ToggleON, // ON
+                        ToggleOFF // OFF
+                }
         );
         // Set colors of the switch. Comment out if you don't like it
 
@@ -647,9 +645,9 @@ public class FloatingModMenuService extends Service {
                 switch (featNum) {
                     case -1: // Save perferences
                         Preferences.with(switchR.getContext()).writeBoolean(-1, bool);
-                        if (bool == false)
+                        if (!bool)
                             Preferences.with(switchR.getContext()).clear(); // Clear perferences if
-                                                                            // switched off
+                        // switched off
                         break;
                     case -3:
                         Preferences.isExpanded = bool;
@@ -658,12 +656,12 @@ public class FloatingModMenuService extends Service {
 
                     case -1000:
                         mExpanded.setBackground(gdAnimation);
-                        if (bool == false)
+                        if (!bool)
                             mExpanded.setBackground(gdMenuBody);
                         break;
                     case -2000:
                         setVol = 0.4f;
-                        if (bool == false)
+                        if (!bool)
                             setVol = 0.0f;
                         break;
                 }
@@ -680,7 +678,7 @@ public class FloatingModMenuService extends Service {
         linearLayout.setGravity(Gravity.CENTER);
 
         final TextView textView = new TextView(this);
-        textView.setText(Html.fromHtml(featName + ": <font color='" + NumberTxtColor + "'>" + ((loadedProg == 0) ? min : loadedProg)));
+        textView.setText(fromHtml(featName + ": <font color='" + NumberTxtColor + "'>" + ((loadedProg == 0) ? min : loadedProg)));
         textView.setTextColor(TEXT_COLOR_2);
         textView.setTypeface(null, Typeface.BOLD);
         textView.setTextSize(13.0f);
@@ -695,9 +693,11 @@ public class FloatingModMenuService extends Service {
         seekBar.getThumb().setColorFilter(SeekBarColor, PorterDuff.Mode.SRC_ATOP);
         seekBar.getProgressDrawable().setColorFilter(SeekBarProgressColor, PorterDuff.Mode.SRC_ATOP);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            public void onStartTrackingTouch(SeekBar seekBar) {}
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
 
-            public void onStopTrackingTouch(SeekBar seekBar) {}
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
 
             int l;
 
@@ -713,7 +713,7 @@ public class FloatingModMenuService extends Service {
                 // if progress is greater than minimum, don't go below. Else, set progress
                 seekBar.setProgress(i < min ? min : i);
                 Preferences.changeFeatureInt(featName, featNum, i < min ? min : i);
-                textView.setText(Html.fromHtml(featName + ": <font color='" + NumberTxtColor + "'>" + (i < min ? min : i)));
+                textView.setText(fromHtml(featName + ": <font color='" + NumberTxtColor + "'>" + (i < min ? min : i)));
                 textView.setTypeface(null, Typeface.BOLD);
             }
         });
@@ -730,7 +730,7 @@ public class FloatingModMenuService extends Service {
         button.setLayoutParams(layoutParams);
         button.setTextColor(TEXT_COLOR_2);
         button.setAllCaps(false); // Disable caps to support html
-        button.setText(Html.fromHtml(featName));
+        button.setText(fromHtml(featName));
         button.setTextSize(13.0f);
         button.setBackgroundColor(BTN_COLOR);
         button.setOnClickListener(new View.OnClickListener() {
@@ -738,10 +738,8 @@ public class FloatingModMenuService extends Service {
                 playSound(Uri.fromFile(new File(cacheDir + "On.ogg")));
                 switch (featNum) {
                     case -4:
-                        Logcat.Save(getApplicationContext());
                         break;
                     case -5:
-                        Logcat.Clear(getApplicationContext());
                         break;
                     case -6:
                         playSound(Uri.fromFile(new File(cacheDir + "Back.ogg")));
@@ -768,7 +766,7 @@ public class FloatingModMenuService extends Service {
         button.setAllCaps(false); // Disable caps to support html
         button.setTextColor(TEXT_COLOR_2);
         button.setTypeface(null, Typeface.BOLD);
-        button.setText(Html.fromHtml(featName));
+        button.setText(fromHtml(featName));
         button.setTextSize(13.0f);
         button.setBackgroundColor(BTN_COLOR);
         button.setOnClickListener(new View.OnClickListener() {
@@ -797,12 +795,12 @@ public class FloatingModMenuService extends Service {
         boolean isOn = Preferences.loadPrefBool(featName, featNum, switchedOn);
         if (isOn) {
             playSound(Uri.fromFile(new File(cacheDir + "On.ogg")));
-            button.setText(Html.fromHtml(finalfeatName + ": ON"));
+            button.setText(fromHtml(finalfeatName + ": ON"));
             button.setBackgroundColor(BtnON);
             isOn = false;
         } else {
             playSound(Uri.fromFile(new File(cacheDir + "Off.ogg")));
-            button.setText(Html.fromHtml(finalfeatName + ": OFF"));
+            button.setText(fromHtml(finalfeatName + ": OFF"));
             button.setBackgroundColor(BtnOFF);
             isOn = true;
         }
@@ -815,12 +813,12 @@ public class FloatingModMenuService extends Service {
                 // Log.d(TAG, finalfeatName + " " + featNum + " " + isActive2);
                 if (isOn) {
                     playSound(Uri.fromFile(new File(cacheDir + "On.ogg")));
-                    button.setText(Html.fromHtml(finalfeatName + ": ON"));
+                    button.setText(fromHtml(finalfeatName + ": ON"));
                     button.setBackgroundColor(BtnON);
                     isOn = false;
                 } else {
                     playSound(Uri.fromFile(new File(cacheDir + "Off.ogg")));
-                    button.setText(Html.fromHtml(finalfeatName + ": OFF"));
+                    button.setText(fromHtml(finalfeatName + ": OFF"));
                     button.setBackgroundColor(BtnOFF);
                     isOn = true;
                 }
@@ -830,44 +828,124 @@ public class FloatingModMenuService extends Service {
     }
 
     private View Spinner(final int featNum, final String featName, final String list) {
+        // Логируем входные данные
         Log.d(TAG, "spinner " + featNum + " " + featName + " " + list);
-        final List<String> lists = new LinkedList<>(Arrays.asList(list.split(",")));
 
-        // Create another LinearLayout as a workaround to use it as a background
-        // to keep the down arrow symbol. No arrow symbol if setBackgroundColor set
-        LinearLayout linearLayout2 = new LinearLayout(this);
-        LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams(MATCH_PARENT, dp(40));
-        layoutParams2.setMargins(7, 2, 7, 5);
-        linearLayout2.setOrientation(LinearLayout.VERTICAL);
-        linearLayout2.setBackgroundColor(BTN_COLOR);
-        linearLayout2.setLayoutParams(layoutParams2);
+        // Разбиваем строку по запятым
+        final List<String> rawList = new LinkedList<>(Arrays.asList(list.split(",")));
 
+        // Оставляем только текст после номера (0_, 1_ и т.д.)
+        final List<String> lists = new LinkedList<>();
+        for (String item : rawList) {
+            if (item.contains("_")) {
+                lists.add(item.substring(item.indexOf("_") + 1));
+            } else {
+                lists.add(item);
+            }
+        }
+
+        // Главный горизонтальный контейнер
+        LinearLayout mainLayout = new LinearLayout(this);
+        mainLayout.setOrientation(LinearLayout.HORIZONTAL);
+        mainLayout.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
+        mainLayout.setPadding(dp(10), dp(0), dp(10), dp(0));
+
+        // Фон кнопок
+        final GradientDrawable buttonDrawable = new GradientDrawable();
+        buttonDrawable.setColor(Color.BLACK);
+        buttonDrawable.setCornerRadius(dp(7));
+        buttonDrawable.setStroke(dp(3), Color.RED);
+
+        // Фон контейнера Spinner
+        final GradientDrawable spinnerBackground = new GradientDrawable();
+        spinnerBackground.setColor(Color.WHITE);
+        spinnerBackground.setCornerRadius(dp(7));
+        spinnerBackground.setStroke(dp(3), Color.RED);
+
+        // Левая кнопка <<
+        Button leftButton = new Button(this);
+        leftButton.setText("<<");
+        // leftButton.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/MyFont.ttf"));
+        leftButton.setBackground(buttonDrawable);
+        leftButton.setTextColor(Color.CYAN);
+        LinearLayout.LayoutParams leftParams = new LinearLayout.LayoutParams(dp(50), dp(45));
+        leftParams.setMargins(dp(5), 0, dp(2), dp(5));
+        leftButton.setLayoutParams(leftParams);
+
+        // Контейнер для Spinner
+        RelativeLayout spinnerContainer = new RelativeLayout(this);
+        LinearLayout.LayoutParams spinnerContainerParams = new LinearLayout.LayoutParams(0, WRAP_CONTENT, 1);
+        spinnerContainer.setLayoutParams(spinnerContainerParams);
+        spinnerContainer.setBackground(spinnerBackground);
+
+        // Сам Spinner
         final Spinner spinner = new Spinner(this, Spinner.MODE_DROPDOWN);
-        spinner.setLayoutParams(layoutParams2);
-        spinner.getBackground().setColorFilter(1, PorterDuff.Mode.SRC_ATOP); // trick to show white
-                                                                             // down arrow color
-        // Creating the ArrayAdapter instance having the list
-        ArrayAdapter aa = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, lists);
+        RelativeLayout.LayoutParams spinnerParams =
+                new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, dp(45));
+        spinner.setLayoutParams(spinnerParams);
+        spinner.setPadding(dp(10), dp(5), dp(10), dp(5));
+        spinner.getBackground().setColorFilter(new PorterDuffColorFilter(Color.TRANSPARENT, PorterDuff.Mode.CLEAR));
+
+        // Адаптер с кастомизацией цвета
+        ArrayAdapter<String> aa = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, lists) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                TextView view = (TextView) super.getView(position, convertView, parent);
+                // view.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/MyFont.ttf"));
+                view.setTextColor(Color.RED);
+                return view;
+            }
+
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                TextView view = (TextView) super.getDropDownView(position, convertView, parent);
+                view.setTextColor(Color.BLACK);
+                return view;
+            }
+        };
         aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Setting the ArrayAdapter data on the Spinner'
+
         spinner.setAdapter(aa);
         spinner.setSelection(Preferences.loadPrefInt(featName, featNum));
+
+        // Обработчик выбора
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<
-                            ?> parentView, View selectedItemView, int position, long id) {
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Preferences.changeFeatureInt(spinner.getSelectedItem().toString(), featNum, position);
-                ((TextView) parentView.getChildAt(0)).setTextSize(13.0f);
-                ((TextView) parentView.getChildAt(0)).setTextColor(TEXT_COLOR_2);
-                ((TextView) parentView.getChildAt(0)).setTypeface(null, Typeface.BOLD);
                 playSound(Uri.fromFile(new File(cacheDir + "Select.ogg")));
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
-        linearLayout2.addView(spinner);
-        return linearLayout2;
+
+        spinnerContainer.addView(spinner);
+
+        // Правая кнопка >>
+        Button rightButton = new Button(this);
+        rightButton.setText(">>");
+        rightButton.setBackground(buttonDrawable);
+        rightButton.setTextColor(TEXT_COLOR_2);
+        LinearLayout.LayoutParams rightParams = new LinearLayout.LayoutParams(dp(50), dp(45));
+        rightParams.setMargins(dp(2), 0, dp(5), dp(5));
+        rightButton.setLayoutParams(rightParams);
+
+        leftButton.setOnClickListener(v -> {
+            int currentPosition = spinner.getSelectedItemPosition();
+            if (currentPosition > 0) spinner.setSelection(currentPosition - 1);
+        });
+
+        rightButton.setOnClickListener(v -> {
+            int currentPosition = spinner.getSelectedItemPosition();
+            if (currentPosition < lists.size() - 1) spinner.setSelection(currentPosition + 1);
+        });
+
+        mainLayout.addView(leftButton);
+        mainLayout.addView(spinnerContainer);
+        mainLayout.addView(rightButton);
+
+        return mainLayout;
     }
 
     private View TextField(final int featNum, final String featName, final boolean numOnly, final int maxValue) {
@@ -881,11 +959,11 @@ public class FloatingModMenuService extends Service {
         if (numOnly) {
             int num = Preferences.loadPrefInt(featName, featNum);
             edittextnum.setNum((num == 0) ? 1 : num);
-            button.setText(Html.fromHtml(featName + ": <font color='" + NumberTxtColor + "'>" + ((num == 0) ? 1 : num) + "</font>"));
+            button.setText(fromHtml(featName + ": <font color='" + NumberTxtColor + "'>" + ((num == 0) ? 1 : num) + "</font>"));
         } else {
             String string = Preferences.loadPrefString(featName, featNum);
-            edittextstring.setString((string == "") ? "" : string);
-            button.setText(Html.fromHtml(featName + ": <font color='" + NumberTxtColor + "'>" + string + "</font>"));
+            edittextstring.setString(string);
+            button.setText(fromHtml(featName + ": <font color='" + NumberTxtColor + "'>" + string + "</font>"));
             button.setTextSize(13.0f);
         }
         button.setAllCaps(false);
@@ -969,13 +1047,13 @@ public class FloatingModMenuService extends Service {
                                 num = 2147483640;
                             }
                             edittextnum.setNum(num);
-                            button.setText(Html.fromHtml(featName + ": <font color='" + NumberTxtColor + "'>" + num + "</font>"));
+                            button.setText(fromHtml(featName + ": <font color='" + NumberTxtColor + "'>" + num + "</font>"));
                             alert.dismiss();
                             Preferences.changeFeatureInt(featName, featNum, num);
                         } else {
                             String str = edittext.getText().toString();
                             edittextstring.setString(edittext.getText().toString());
-                            button.setText(Html.fromHtml(featName + ": <font color='" + NumberTxtColor + "'>" + str + "</font>"));
+                            button.setText(fromHtml(featName + ": <font color='" + NumberTxtColor + "'>" + str + "</font>"));
                             alert.dismiss();
                             Preferences.changeFeatureString(featName, featNum, str);
                         }
@@ -1111,7 +1189,7 @@ public class FloatingModMenuService extends Service {
     private View Category(String text) {
         TextView textView = new TextView(this);
         textView.setBackgroundColor(CategoryBG);
-        textView.setText(Html.fromHtml(text));
+        textView.setText(fromHtml(text));
         textView.setGravity(Gravity.CENTER);
         textView.setTextColor(TEXT_COLOR_2);
         textView.setTypeface(null, Typeface.BOLD);
@@ -1122,7 +1200,7 @@ public class FloatingModMenuService extends Service {
 
     private View RichTextView(String text) {
         TextView textView = new TextView(this);
-        textView.setText(Html.fromHtml(text));
+        textView.setText(fromHtml(text));
         textView.setTextColor(TEXT_COLOR_2);
         textView.setTypeface(null, Typeface.BOLD);
         textView.setPadding(10, 5, 10, 5);
@@ -1137,8 +1215,6 @@ public class FloatingModMenuService extends Service {
         wView.setPadding(0, 5, 0, 5);
         return wView;
     }
-
-    int secondaryColor;
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public void startAnimation() {
@@ -1213,7 +1289,7 @@ public class FloatingModMenuService extends Service {
     }
 
     private int dp(int i) {
-        return (int) TypedValue.applyDimension(1, (float) i, getResources().getDisplayMetrics());
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (float) i, getResources().getDisplayMetrics());
     }
 
     // Check if we are still in the game. If now our menu and menu button will dissapear

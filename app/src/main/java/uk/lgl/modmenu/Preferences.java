@@ -3,7 +3,6 @@ package uk.lgl.modmenu;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 import android.os.Build;
 
 import java.util.LinkedHashSet;

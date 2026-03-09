@@ -2,6 +2,7 @@
 #define NepEsp_H
 
 #include <jni.h>
+
 class NepEsp {
 private:
     JNIEnv *_env;
@@ -88,7 +89,8 @@ public:
         DrawLine(color, stroke, v4, v1);
     }
 
-    void DrawHorizontalHealthBar(Vector2 screenPos, float width, float maxHealth, float currentHealth) {
+    void
+    DrawHorizontalHealthBar(Vector2 screenPos, float width, float maxHealth, float currentHealth) {
         screenPos -= Vector2(0.0f, 8.0f);
         DrawBox(Color(0, 0, 0, 255), 3, Rect(screenPos.X, screenPos.Y, width + 2, 5.0f));
         screenPos += Vector2(1.0f, 1.0f);
